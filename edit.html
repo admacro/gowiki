@@ -1,0 +1,14 @@
+<html>
+    <head>
+        <title>Editing {{.Title}}</title>
+    </head>
+    <body>
+        <h1>{{.Title}}</h1>
+        <p>[<a href="/view/{{.Title}}">back</a>]</p>
+        <form action='/save/{{.Title}}' method='POST'>
+            <div><textarea name='body' rows="20" cols="80">{{printf "%s" .Body}}</textarea></div>
+            <div><input value='Save' type='submit'></div>
+        </form>
+    </body>
+</html>
+
