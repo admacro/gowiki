@@ -4,11 +4,11 @@ package main
 import (
 	"errors"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"regexp"
-	"text/template"
 )
 
 type Page struct {
@@ -25,20 +25,23 @@ const (
 // regexp groups: /handlerName/title
 var validPaths = regexp.MustCompile("^/(view|edit|save)/([a-zA-Z0-9]+)$")
 
-var templates = template.Must(template.ParseFiles("view.html", "edit.html"))
+// var templates = template.Must(template.ParseFiles("tmpl/view.html", "tmpl/edit.html"))
+var templates = template.Must(template.ParseGlob("tmpl/*.html"))
 
 func (p *Page) save() error {
-	filename := p.Title + ".txt"
-	return ioutil.WriteFile(filename, p.Body, 0600)
+	return ioutil.WriteFile(getDataFilename(p.Title), p.Body, 0600)
 }
 
 func loadPage(title string) (*Page, error) {
-	filename := title + ".txt"
-	body, err := ioutil.ReadFile(filename)
+	body, err := ioutil.ReadFile(getDataFilename(title))
 	if err != nil {
 		return nil, err
 	}
 	return &Page{Title: title, Body: body}, nil
+}
+
+func getDataFilename(title string) string {
+	return fmt.Sprintf("data/%s.txt", title)
 }
 
 func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
@@ -113,7 +116,7 @@ func main() {
 
 // func main() {
 // 	page := Page{"TestPage", []byte("This is a test page.")}
-// 	writeErr := page.Save()
+// 	writeErr := page.save()
 // 	if writeErr != nil {
 // 		panic(fmt.Sprintf("Error saving file: \n%v", writeErr.Error()))
 // 	}
