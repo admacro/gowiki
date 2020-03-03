@@ -5,3 +5,5 @@ Hi
 hello
 
 golang is fun
+
+better to make the content preserve formatting

@@ -5,29 +5,15 @@
 		    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
 		    <link href="/static/min.css" rel="stylesheet" type="text/css">
 
-		    <style type="text/css">
-		     /* Min+ plugin*/
-		     /* message {
-				    display: block;
-				    padding: 2em;
-				    background: #def;
-				    border-left: 5px solid #44e;
-		        }
-
-		        .warning {
-				    border-color: #e44; 
-				    background: #fdd;
-		        }
-
-		        .great {
-				    border-color: #2d2;
-				    background: #dfd;
-		        } */
-		    </style>
         <title>{{.Title}}</title>
     </head>
     <body>
-        <h1>{{.Title}}</h1><a class="btn btn-b btn-sm smooth" href="/edit/{{.Title}}">edit</a>
+        <div class="row">
+            <div class="col c12">
+                <a class="btn btn-b btn-sm smooth" href="/edit/{{.Title}}">edit</a>
+            </div>
+        </div>
+        <h1>{{.Title}}</h1>
         <div>{{printf "%s" .Body}}</div>
         <div><img src="/static/mickey.png" /></div>
     </body>
