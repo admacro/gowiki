@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"mime"
 	"net/http"
 	"regexp"
 )
@@ -17,13 +18,19 @@ type Page struct {
 }
 
 const (
-	VIEW = "/view/"
-	EDIT = "/edit/"
-	SAVE = "/save/"
+	VIEW      = "/view/"
+	EDIT      = "/edit/"
+	SAVE      = "/save/"
+	MIME_PATH = "/static/"
+
+	STATIC_FILE_PATTERN = "^/static/([a-zA-Z0-9]+)\\.(css|js|jpg|png)$"
+
+	FRONTPAGE = "/view/FrontPage"
 )
 
 // regexp groups: /handlerName/title
-var validPaths = regexp.MustCompile("^/(view|edit|save)/([a-zA-Z0-9]+)$")
+var validPath = regexp.MustCompile("^/(view|edit|save)/([a-zA-Z0-9]+)$")
+var mimePath = regexp.MustCompile(STATIC_FILE_PATTERN)
 
 // var templates = template.Must(template.ParseFiles("tmpl/view.html", "tmpl/edit.html"))
 var templates = template.Must(template.ParseGlob("tmpl/*.html"))
@@ -46,7 +53,7 @@ func getDataFilename(title string) string {
 
 func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
 	// example of m: [/view/TestPage view TestPage]
-	m := validPaths.FindStringSubmatch(r.URL.Path)
+	m := validPath.FindStringSubmatch(r.URL.Path)
 	if m == nil {
 		http.NotFound(w, r)
 		return "", errors.New("invalid page title")
@@ -71,6 +78,27 @@ func makeHandler(fn func(w http.ResponseWriter, r *http.Request, title string)) 
 		}
 		fn(w, r, title)
 	}
+}
+
+func frontpageHandler(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, FRONTPAGE, http.StatusFound)
+}
+
+func mimeHandler(w http.ResponseWriter, r *http.Request) {
+	m := mimePath.FindStringSubmatch(r.URL.Path)
+	if m == nil {
+		http.NotFound(w, r)
+	}
+	fmt.Printf("URL matched: %v\n", m)
+	mimeFilePath := m[0]
+	mimeExtention := m[2]
+	mimeFile, err := ioutil.ReadFile(mimeFilePath[1:])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", mime.TypeByExtension(mimeExtention))
+	w.Write(mimeFile)
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
@@ -106,6 +134,8 @@ func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
 func main() {
 	fmt.Println("Starting server at localhost:8080")
 
+	http.HandleFunc("/", frontpageHandler)
+	http.HandleFunc(MIME_PATH, mimeHandler)
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
