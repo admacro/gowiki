@@ -18,22 +18,21 @@ type Page struct {
 }
 
 const (
-	VIEW      = "/view/"
-	EDIT      = "/edit/"
-	SAVE      = "/save/"
-	MIME_PATH = "/static/"
+	validPathPattern      = "^/(view|edit|save)/([a-zA-Z0-9]+)$"
+	staticFilePathPattern = "^/static/([a-zA-Z0-9]+)\\.(css|js|jpg|png)$"
 
-	STATIC_FILE_PATTERN = "^/static/([a-zA-Z0-9]+)\\.(css|js|jpg|png)$"
-
-	FRONTPAGE = "/view/FrontPage"
+	frontpage = "/view/FrontPage"
 )
 
-// regexp groups: /handlerName/title
-var validPath = regexp.MustCompile("^/(view|edit|save)/([a-zA-Z0-9]+)$")
-var mimePath = regexp.MustCompile(STATIC_FILE_PATTERN)
+var validPath = regexp.MustCompile(validPathPattern)
+var mimePath = regexp.MustCompile(staticFilePathPattern)
 
 // var templates = template.Must(template.ParseFiles("tmpl/view.html", "tmpl/edit.html"))
 var templates = template.Must(template.ParseGlob("tmpl/*.html"))
+
+func (p *Page) BodyHtml() template.HTML {
+	return template.HTML(p.Body)
+}
 
 func (p *Page) save() error {
 	return ioutil.WriteFile(getDataFilename(p.Title), p.Body, 0600)
@@ -81,7 +80,7 @@ func makeHandler(fn func(w http.ResponseWriter, r *http.Request, title string)) 
 }
 
 func frontpageHandler(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, FRONTPAGE, http.StatusFound)
+	http.Redirect(w, r, frontpage, http.StatusFound)
 }
 
 func mimeHandler(w http.ResponseWriter, r *http.Request) {
@@ -101,13 +100,23 @@ func mimeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(mimeFile)
 }
 
+func linkPage(body []byte) []byte {
+	pageInstance := regexp.MustCompile("\\[([a-zA-Z0-9]+)\\]")
+	repl := func(m []byte) []byte {
+		s := string(m[1 : len(m)-1])
+		pageLink := fmt.Sprintf("<a href='/view/%s'>%s</a>", s, s)
+		return []byte(pageLink)
+	}
+	return pageInstance.ReplaceAllFunc(body, repl)
+}
+
 func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
 	page, err := loadPage(title)
 	if err != nil {
 		http.Redirect(w, r, EDIT+title, http.StatusFound)
 		return
 	}
-
+	page.Body = linkPage(page.Body)
 	renderTemplate(w, page, "view")
 }
 
@@ -116,7 +125,6 @@ func editHandler(w http.ResponseWriter, r *http.Request, title string) {
 	if err != nil {
 		page = &Page{Title: title}
 	}
-
 	renderTemplate(w, page, "edit")
 }
 
@@ -127,15 +135,14 @@ func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	http.Redirect(w, r, VIEW+title, http.StatusFound)
+	http.Redirect(w, r, "/view/"+title, http.StatusFound)
 }
 
 func main() {
 	fmt.Println("Starting server at localhost:8080")
 
 	http.HandleFunc("/", frontpageHandler)
-	http.HandleFunc(MIME_PATH, mimeHandler)
+	http.HandleFunc("/static/", mimeHandler)
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))
