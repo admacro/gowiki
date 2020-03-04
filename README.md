@@ -10,3 +10,4 @@ Writing web application in Go, the [Go Wiki](https://golang.org/doc/articles/wik
 
 #### Additional Features
  - ✔ Add `mimeHandler` to handle static files (css, png, etc.)
+ - ✔ Display page in its original formatting (e.g. newline)
