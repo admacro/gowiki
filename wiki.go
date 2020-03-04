@@ -110,13 +110,18 @@ func linkPage(body []byte) []byte {
 	return pageInstance.ReplaceAllFunc(body, repl)
 }
 
+func formatPage(body []byte) []byte {
+	return regexp.MustCompile("\n").ReplaceAll(body, []byte("<br>"))
+}
+
 func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
 	page, err := loadPage(title)
 	if err != nil {
-		http.Redirect(w, r, EDIT+title, http.StatusFound)
+		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
 		return
 	}
 	page.Body = linkPage(page.Body)
+	page.Body = formatPage(page.Body)
 	renderTemplate(w, page, "view")
 }
 
