@@ -8,14 +8,16 @@
         <title>{{.Title}}</title>
     </head>
     <body>
-        <div class="row">
-            <div class="col c12">
-                <a class="btn btn-b btn-sm smooth" href="/edit/{{.Title}}">edit</a>
-            </div>
+        <div class="container">
+            <a class="btn btn-b btn-sm smooth" href="/edit/{{.Title}}">edit</a>
         </div>
-        <h1>{{.Title}}</h1>
-        <div>{{printf "%s" .Body}}</div>
-        <div><img src="/static/mickey.png" /></div>
+        <div class="container">
+            <h1>{{.Title}}</h1>
+            <p>{{printf "%s" .Body}}</p>
+        </div>
+        <div class="container">
+            <img src="/static/mickey.png" />
+        </div>
     </body>
 </html>
 

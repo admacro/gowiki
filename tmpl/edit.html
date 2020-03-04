@@ -15,22 +15,16 @@
         </style>
     </head>
     <body>
-        <div class="row">
-            <div class="col c12">
-                <a class="btn btn-b btn-sm smooth" href="/view/{{.Title}}">back</a>
-            </div>
+        <div class="container">
+            <a class="btn btn-b btn-sm smooth" href="/view/{{.Title}}">back</a>
         </div>
-        <h1>{{.Title}}</h1>
-        <form action='/save/{{.Title}}' method='POST'>
-            <div class="row">
-                <div class="col c12">
-                    <textarea name='body' class="smooth">{{printf "%s" .Body}}</textarea>
-                </div>
-                <div class="col c12">
-                    <input value='Save' type='submit' class="smooth">
-                </div>
-            </div>
-        </form>
+        <div class="container">
+            <h2>{{.Title}}</h2>
+            <form action='/save/{{.Title}}' method='POST'>
+                <textarea name='body' class="smooth">{{printf "%s" .Body}}</textarea>
+                <input value='Save' type='submit' class="smooth">
+            </form>
+        </div>
     </body>
 </html>
 
