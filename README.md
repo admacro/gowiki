@@ -8,7 +8,8 @@ Writing web application in Go, the [Go Wiki](https://golang.org/doc/articles/wik
  - Spruce up the page templates by making them valid HTML and adding
    some CSS rules. [Done. Using min.css]
  - Implement inter-page linking by converting instances of `[PageName]` to
-`<a href="/view/PageName">PageName</a>`. (hint: you could use `regexp.ReplaceAllFunc` to do this)
+`<a href="/view/PageName">PageName</a>`. (hint: you could use
+`regexp.ReplaceAllFunc` to do this) [Done]
 
 #### Additional Features
  - Add `mimeHandler` to handle static files (css, png, etc.)
