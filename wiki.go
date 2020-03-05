@@ -20,12 +20,13 @@ type Page struct {
 const (
 	validPathPattern      = "^/(view|edit|save)/([a-zA-Z0-9]+)$"
 	staticFilePathPattern = "^/static/([a-zA-Z0-9]+)\\.(css|js|jpg|png)$"
-
-	frontpage = "/view/FrontPage"
+	pageInstancePattern   = "\\[([a-zA-Z0-9]+)\\]"
+	frontpage             = "/view/FrontPage"
 )
 
 var validPath = regexp.MustCompile(validPathPattern)
 var mimePath = regexp.MustCompile(staticFilePathPattern)
+var pageInstance = regexp.MustCompile(pageInstancePattern)
 
 // var templates = template.Must(template.ParseFiles("tmpl/view.html", "tmpl/edit.html"))
 var templates = template.Must(template.ParseGlob("tmpl/*.html"))
@@ -101,7 +102,6 @@ func mimeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func linkPage(body []byte) []byte {
-	pageInstance := regexp.MustCompile("\\[([a-zA-Z0-9]+)\\]")
 	repl := func(m []byte) []byte {
 		s := string(m[1 : len(m)-1])
 		pageLink := fmt.Sprintf("<a href='/view/%s'>%s</a>", s, s)
