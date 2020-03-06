@@ -101,7 +101,7 @@ func mimeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(mimeFile)
 }
 
-func linkPage(body []byte) []byte {
+func linkInterPages(body []byte) []byte {
 	repl := func(m []byte) []byte {
 		s := string(m[1 : len(m)-1])
 		pageLink := fmt.Sprintf("<a href='/view/%s'>%s</a>", s, s)
@@ -120,7 +120,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
 		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
 		return
 	}
-	page.Body = linkPage(page.Body)
+	page.Body = linkInterPages(page.Body)
 	page.Body = formatPage(page.Body)
 	renderTemplate(w, page, "view")
 }
