@@ -121,8 +121,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
 		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
 		return
 	}
-	page.Body = linkInterPages(page.Body)
-	page.Body = formatPage(page.Body)
+	page.Body = formatPage(linkInterPages(page.Body))
 	renderTemplate(w, page, "view")
 }
 
