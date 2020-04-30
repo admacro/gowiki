@@ -69,6 +69,7 @@ func renderTemplate(w http.ResponseWriter, page *Page, tmplName string) {
 	}
 }
 
+// http.Handlerfunc implements http.Handler interface
 func makeHandler(fn func(w http.ResponseWriter, r *http.Request, title string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Handling URL: %s\n", r.URL.Path)
