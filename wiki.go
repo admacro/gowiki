@@ -12,11 +12,6 @@ import (
 	"regexp"
 )
 
-type Page struct {
-	Title string
-	Body  []byte
-}
-
 const (
 	validPathPattern      = "^/(view|edit|save)/([a-zA-Z0-9]+)$"
 	staticFilePathPattern = "^/static/([a-zA-Z0-9]+)\\.(css|js|jpg|png)$"
@@ -30,6 +25,11 @@ var pageInstance = regexp.MustCompile(pageInstancePattern)
 
 // var templates = template.Must(template.ParseFiles("tmpl/view.html", "tmpl/edit.html"))
 var templates = template.Must(template.ParseGlob("tmpl/*.html"))
+
+type Page struct {
+	Title string
+	Body  []byte
+}
 
 func (p *Page) BodyHtml() template.HTML {
 	return template.HTML(p.Body)
